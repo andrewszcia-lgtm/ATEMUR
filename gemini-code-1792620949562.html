@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citación de Personal y Gestión de Candidatos - Auxiliar Educativo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 flex flex-col bg-slate-50 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- ENCABEZADO Y BARRA DE NAVEGACIÓN -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shadow-inner">
+                        <i class="fa-solid fa-user-graduate text-xl sm:text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">Citación de Personal</h1>
+                            <span class="bg-indigo-500/20 text-indigo-200 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-indigo-400/30">
+                                Auxiliar Educativo
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-300">Gestión de sustituciones y bolsa de candidatos</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center self-end md:self-auto bg-slate-800/80 p-1.5 sm:p-2 rounded-xl border border-slate-700/60 shadow-inner">
+                    <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="flex items-center gap-1.5 sm:gap-2">
+                        <div class="relative flex items-center">
+                            <input 
+                                type="password" 
+                                id="admin-pin-input" 
+                                class="w-28 sm:w-36 bg-slate-900 text-slate-100 text-xs sm:text-sm rounded-lg pl-2.5 pr-8 py-1.5 border border-slate-600 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" 
+                                autocomplete="off"
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePasswordVisibility()" 
+                                class="absolute right-2 text-slate-400 hover:text-slate-200 text-xs focus:outline-none p-1"
+                                title="Mostrar / Ocultar caracteres"
+                            >
+                                <i id="eye-icon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <button 
+                            type="submit" 
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition duration-150 flex items-center gap-1.5 shadow"
+                        >
+                            <i class="fa-solid fa-lock text-xs"></i>
+                            <span>Acceso Admin</span>
+                        </button>
+                    </form>
+
+                    <div id="admin-logged-panel" class="hidden flex items-center gap-3 px-2">
+                        <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-1 rounded-lg">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Admin Activo</span>
+                        </div>
+                        <button 
+                            onclick="handleAdminLogout()" 
+                            class="bg-slate-700 hover:bg-red-600/80 text-slate-200 hover:text-white text-xs font-medium px-2.5 py-1.5 rounded-lg transition duration-150 flex items-center gap-1"
+                            title="Cerrar sesión de administrador"
+                        >
+                            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                            <span>Salir</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            
+            <div onclick="setFilter('todos')" id="card-filter-todos" class="cursor-pointer bg-white p-4 rounded-xl shadow-sm border-2 border-indigo-500 hover:shadow-md transition group relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Lista</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fa-solid fa-users text-lg"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-center text-[11px] text-indigo-600 font-medium">
+                    <span>Ver todos</span>
+                    <i class="fa-solid fa-chevron-right ml-1 text-[9px]"></i>
+                </div>
+            </div>
+
+            <div onclick="setFilter('disponible')" id="card-filter-disponible" class="cursor-pointer bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-emerald-400 hover:shadow-md transition group relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Disponibles</p>
+                        <h3 id="stat-disponibles" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fa-solid fa-circle-check text-lg"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-center text-[11px] text-emerald-600 font-medium">
+                    <span>Filtrar disponibles</span>
+                    <i class="fa-solid fa-chevron-right ml-1 text-[9px]"></i>
+                </div>
+            </div>
+
+            <div onclick="setFilter('desactivado')" id="card-filter-desactivado" class="cursor-pointer bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-rose-400 hover:shadow-md transition group relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Desactivados</p>
+                        <h3 id="stat-desactivados" class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fa-solid fa-circle-xmark text-lg"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-center text-[11px] text-rose-600 font-medium">
+                    <span>Filtrar desactivados</span>
+                    <i class="fa-solid fa-chevron-right ml-1 text-[9px]"></i>
+                </div>
+            </div>
+
+            <div onclick="setFilter('con_interes')" id="card-filter-con_interes" class="cursor-pointer bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-amber-400 hover:shadow-md transition group relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Con Preferencias</p>
+                        <h3 id="stat-actualizados" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fa-solid fa-pen-to-square text-lg"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-center text-[11px] text-amber-600 font-medium">
+                    <span>Han indicado interés</span>
+                    <i class="fa-solid fa-chevron-right ml-1 text-[9px]"></i>
+                </div>
+            </div>
+
+        </section>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    oninput="handleSearch()" 
+                    placeholder="Buscar por Nombre, DNI, Nº orden, Puestos optados o Puestos de interés..." 
+                    class="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                />
+                <button 
+                    id="search-clear-btn" 
+                    onclick="clearSearch()" 
+                    class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+                
+                <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+                    <button 
+                        onclick="switchView('table')" 
+                        id="view-btn-table" 
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md transition shadow-sm bg-white text-indigo-700"
+                        title="Vista de Tabla"
+                    >
+                        <i class="fa-solid fa-table-cells mr-1"></i> Tabla
+                    </button>
+                    <button 
+                        onclick="switchView('cards')" 
+                        id="view-btn-cards" 
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900"
+                        title="Vista de Tarjetas"
+                    >
+                        <i class="fa-solid fa-address-card mr-1"></i> Tarjetas
+                    </button>
+                </div>
+
+                <div id="admin-actions-bar" class="hidden flex items-center gap-2 border-l border-slate-200 pl-2">
+                    <button 
+                        onclick="openCandidateModalForAdmin(null)" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nuevo Candidate</span>
+                    </button>
+
+                    <button 
+                        onclick="openImportModal()" 
+                        class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm"
+                        title="Importar lista desde Excel o texto copiado"
+                    >
+                        <i class="fa-solid fa-file-import"></i>
+                        <span>Importar</span>
+                    </button>
+
+                    <button 
+                        onclick="confirmClearAll()" 
+                        class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium px-2.5 py-2 rounded-lg transition flex items-center gap-1"
+                        title="Vaciar la lista de candidatos"
+                    >
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+
+                <button 
+                    onclick="confirmResetDefaults()" 
+                    class="text-xs text-slate-500 hover:text-slate-800 underline px-2 py-2"
+                    title="Restablecer los 11 candidatos iniciales con puestos de interés vacíos"
+                >
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Restablecer iniciales
+                </button>
+
+            </div>
+        </div>
+
+        <!-- VISTA TABLA DE CANDIDATOS -->
+        <div id="view-container-table" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100/80 border-b border-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wider">
+                            <th scope="col" class="py-3.5 px-4 w-20 text-center">Nº orden</th>
+                            <th scope="col" class="py-3.5 px-4 w-28">D.N.I.</th>
+                            <th scope="col" class="py-3.5 px-4">Apellidos y Nombre</th>
+                            <th scope="col" class="py-3.5 px-4">Puestos a los que puede optar</th>
+                            <th scope="col" class="py-3.5 px-4">Puestos de interés</th>
+                            <th scope="col" class="py-3.5 px-4 w-32 text-center">Estado</th>
+                            <th scope="col" class="py-3.5 px-4 text-center w-40">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidates-table-body" class="divide-y divide-slate-200 text-sm">
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty-state-table" class="hidden p-8 text-center text-slate-500">
+                <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                <p class="font-medium text-slate-600">No se encontraron candidatos que coincidan con la búsqueda.</p>
+                <p class="text-xs text-slate-400 mt-1">Prueba a borrar el filtro de búsqueda o cambiar el filtro de estado.</p>
+            </div>
+        </div>
+
+        <!-- VISTA TARJETAS (CARDS) -->
+        <div id="view-container-cards" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 text-center flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>
+                <span>Sistema de Citación y Selección de Personal &copy; Auxiliar Educativo</span>
+            </div>
+            <div class="text-slate-400">
+                <span>Nota: Los puestos de interés se guardan localmente para cada candidato.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL DE AUTOSERVICIO DEL CANDIDATO (✏️ Actualizar datos) -->
+    <div id="modal-candidate-self" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 transform transition-all">
+            
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-400/30">
+                        <i class="fa-solid fa-user-pen text-indigo-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">Actualizar Mis Datos de Citación</h3>
+                        <p class="text-xs text-indigo-200">Bolsa de Auxiliar Educativo</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-candidate-self')" class="text-slate-400 hover:text-white text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-candidate-self" onsubmit="saveCandidateSelfUpdate(event)" novalidate class="p-6 space-y-5">
+                <input type="hidden" id="self-cand-id">
+
+                <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3.5 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Candidato/a</div>
+                        <div id="self-cand-nombre" class="font-bold text-slate-800 text-base">---</div>
+                        <div class="text-xs text-slate-500 flex items-center gap-3 mt-0.5">
+                            <span>DNI: <strong id="self-cand-dni" class="text-slate-700">---</strong></span>
+                            <span>Nº orden: <strong id="self-cand-orden" class="text-indigo-700">---</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                        Puestos a los que puede optar
+                    </label>
+                    <div id="self-cand-opta-badges" class="flex flex-wrap gap-1.5 p-2.5 bg-slate-50 rounded-lg border border-slate-200 min-h-[42px] items-center">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="self-cand-interes" class="block text-xs font-bold text-slate-800 uppercase">
+                            Puestos de interés <span class="text-rose-500">*</span>
+                        </label>
+                        <span class="text-[11px] text-slate-500">Haga clic en las opciones para añadir/quitar</span>
+                    </div>
+
+                    <div id="quick-select-puestos" class="flex flex-wrap gap-1.5 mb-2">
+                    </div>
+
+                    <input 
+                        type="text" 
+                        id="self-cand-interes" 
+                        placeholder="Ejemplo: 1, 2, 3" 
+                        class="w-full text-sm font-semibold text-indigo-900 px-3 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    />
+                    <p class="text-xs text-slate-500 mt-1">
+                        Escriba o seleccione los números de plaza/puesto en los que desea ser citado/a.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 uppercase mb-2">
+                        Estado de disponibilidad
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50/50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/80 transition">
+                            <input type="radio" name="self-estado" value="disponible" id="self-estado-disp" class="text-emerald-600 focus:ring-emerald-500">
+                            <div>
+                                <div class="text-xs font-bold text-emerald-800">🟢 Disponible</div>
+                                <div class="text-[10px] text-emerald-600">Apto para citación</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-rose-50/50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/80 transition">
+                            <input type="radio" name="self-estado" value="desactivado" id="self-estado-desac" class="text-rose-600 focus:ring-rose-500">
+                            <div>
+                                <div class="text-xs font-bold text-rose-800">🔴 Desactivado</div>
+                                <div class="text-[10px] text-rose-600">No citar temporalmente</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                    <div>
+                        <label for="self-cand-telefono" class="block text-xs font-medium text-slate-600 mb-1">Teléfono (opcional)</label>
+                        <input type="tel" id="self-cand-telefono" placeholder="600 000 000" class="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="self-cand-email" class="block text-xs font-medium text-slate-600 mb-1">Email (opcional)</label>
+                        <input type="email" id="self-cand-email" placeholder="candidato@email.com" class="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-candidate-self')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Guardar Cambios</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ADMINISTRADOR -->
+    <div id="modal-admin-edit" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-user-gear text-indigo-400"></i>
+                    <h3 id="admin-modal-title" class="font-bold text-base">Edición de Candidato (Admin)</h3>
+                </div>
+                <button onclick="closeModal('modal-admin-edit')" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-admin-edit" onsubmit="saveAdminCandidate(event)" class="p-6 space-y-4">
+                <input type="hidden" id="admin-cand-id">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="admin-cand-orden" class="block text-xs font-semibold text-slate-700 mb-1">Nº Orden *</label>
+                        <input type="number" id="admin-cand-orden" required class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="admin-cand-dni" class="block text-xs font-semibold text-slate-700 mb-1">D.N.I. *</label>
+                        <input type="text" id="admin-cand-dni" required placeholder="***0000**" class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="admin-cand-nombre" class="block text-xs font-semibold text-slate-700 mb-1">Apellidos y Nombre *</label>
+                    <input type="text" id="admin-cand-nombre" required placeholder="APELLIDOS, NOMBRE" class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg uppercase">
+                </div>
+
+                <div>
+                    <label for="admin-cand-opta" class="block text-xs font-semibold text-slate-700 mb-1">Puestos a los que opta *</label>
+                    <input type="text" id="admin-cand-opta" required placeholder="1, 2, 3, 4" class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+
+                <div>
+                    <label for="admin-cand-interes" class="block text-xs font-semibold text-slate-700 mb-1">Puestos de interés</label>
+                    <input type="text" id="admin-cand-interes" placeholder="Vacío por defecto o puestos asignados" class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <span class="text-[10px] text-slate-400">Por defecto dejar en blanco ("") para que el candidato lo rellene.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Estado</label>
+                    <select id="admin-cand-estado" class="w-full text-sm px-3 py-1.5 border border-slate-300 rounded-lg">
+                        <option value="disponible">🟢 Disponible</option>
+                        <option value="desactivado">🔴 Desactivado</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modal-admin-edit')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-indigo-700 rounded-lg shadow transition">
+                        Guardar Registro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE IMPORTACIÓN -->
+    <div id="modal-import" class="hidden fixed inset-0 z-50 overflow-y-auto modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100">
+            <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-excel text-emerald-400"></i>
+                    <h3 class="font-bold text-base">Importar Candidatos desde Excel o Copia Tabular</h3>
+                </div>
+                <button onclick="closeModal('modal-import')" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Pegue a continuación las filas copiadas desde un documento Excel o archivo tabulado. <br>
+                    <strong>Formato esperado por línea:</strong> <code class="bg-slate-100 text-indigo-700 px-1 py-0.5 rounded font-mono">NºOrden [TAB] DNI [TAB] Apellidos y Nombre [TAB] Puestos optados</code>. <br>
+                    <span class="text-emerald-700 font-semibold">Nota: Los candidatos importados se guardarán automáticamente con "Puestos de interés" en blanco.</span>
+                </p>
+
+                <div>
+                    <textarea 
+                        id="import-textarea" 
+                        rows="7" 
+                        placeholder="Ejemplo:&#10;86&#1090;***0197**&#1090;RUIZ PEÑALVER, ANTONIA&#1090;1, 2, 3, 6&#10;133&#1090;***5824**&#1090;FUENTES ALONSO, MARIA ISABEL&#1090;1, 2, 3, 4, 5" 
+                        class="w-full text-xs font-mono p-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+                    ></textarea>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <label class="flex items-center text-xs text-slate-600 cursor-pointer">
+                        <input type="checkbox" id="import-replace-chk" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mr-2">
+                        <span>Reemplazar lista completa (en lugar de añadir)</span>
+                    </label>
+
+                    <div class="flex gap-2">
+                        <button onclick="closeModal('modal-import')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">
+                            Cancelar
+                        </button>
+                        <button onclick="processImport()" class="px-5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span>Procesar e Importar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN DE MENSAJES TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="toast-content" class="bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 border border-slate-700">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-msg">Mensaje de notificación</span>
+        </div>
+    </div>
+
+    <script>
+        const INITIAL_CANDIDATES = [
+            { id: 1, orden: 86,  dni: '***0197**', nombre: 'RUIZ PEÑALVER, ANTONIA', opta: '1, 2, 3, 6', interes: '', estado: 'disponible' },
+            { id: 2, orden: 133, dni: '***5824**', nombre: 'FUENTES ALONSO, MARIA ISABEL', opta: '1, 2, 3, 4, 5', interes: '', estado: 'disponible' },
+            { id: 3, orden: 138, dni: '***0198**', nombre: 'RODRIGUEZ MORALES, MARIA JOSE', opta: '1, 2, 3, 4', interes: '', estado: 'disponible' },
+            { id: 4, orden: 165, dni: '***0523**', nombre: 'MORENO MARIN, NEREA', opta: '1, 2, 3, 4, 5', interes: '', estado: 'disponible' },
+            { id: 5, orden: 222, dni: '***7030**', nombre: 'SAORIN YELO, LIDIA', opta: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11', interes: '', estado: 'disponible' },
+            { id: 6, orden: 260, dni: '***3078**', nombre: 'JIMÉNEZ VÁZQUEZ, MARÍA JOSÉ', opta: '1, 2, 5', interes: '', estado: 'disponible' },
+            { id: 7, orden: 267, dni: '***2555**', nombre: 'BELTRAN MORENO, ROSARIO', opta: '1, 2, 3, 4, 5', interes: '', estado: 'disponible' },
+            { id: 8, orden: 268, dni: '***8179**', nombre: 'CRESPO IGLESIAS, MONICA', opta: '1, 2, 3, 4', interes: '', estado: 'disponible' },
+            { id: 9, orden: 296, dni: '***0564**', nombre: 'FERNANDEZ PENA, MARIA ROCIO', opta: '1, 2, 3, 5, 6, 9', interes: '', estado: 'disponible' },
+            { id: 10, orden: 300, dni: '***1710**', nombre: 'DE GEA GUILLEN, AMPARO', opta: '1, 2, 3, 4, 5, 10, 11', interes: '', estado: 'disponible' },
+            { id: 11, orden: 361, dni: '***2582**', nombre: 'MUÑOZ BELMONTE, MARÍA BELÉN', opta: '1, 2, 5', interes: '', estado: 'disponible' }
+        ];
+
+        const ADMIN_PIN_SECRET = "588522";
+
+        let candidates = [];
+        let isAdmin = false;
+        let currentFilter = 'todos';
+        let searchQuery = '';
+        let currentView = 'table';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadInitialData();
+            render();
+        });
+
+        function loadInitialData() {
+            const stored = localStorage.getItem('aux_educativo_candidates');
+            if (stored) {
+                try {
+                    candidates = JSON.parse(stored);
+                } catch(e) {
+                    candidates = JSON.parse(JSON.stringify(INITIAL_CANDIDATES));
+                }
+            } else {
+                candidates = JSON.parse(JSON.stringify(INITIAL_CANDIDATES));
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('aux_educativo_candidates', JSON.stringify(candidates));
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pinInput = document.getElementById('admin-pin-input');
+            if (pinInput.value.trim() === ADMIN_PIN_SECRET) {
+                isAdmin = true;
+                pinInput.value = '';
+                document.getElementById('admin-login-form').classList.add('hidden');
+                document.getElementById('admin-logged-panel').classList.remove('hidden');
+                document.getElementById('admin-logged-panel').classList.add('flex');
+                document.getElementById('admin-actions-bar').classList.remove('hidden');
+                document.getElementById('admin-actions-bar').classList.add('flex');
+                showToast('Modo Administrador concedido', 'success');
+                render();
+            } else {
+                showToast('Clave no válida', 'error');
+                pinInput.value = '';
+                pinInput.focus();
+            }
+        }
+
+        function handleAdminLogout() {
+            isAdmin = false;
+            document.getElementById('admin-login-form').classList.remove('hidden');
+            document.getElementById('admin-logged-panel').classList.add('hidden');
+            document.getElementById('admin-logged-panel').classList.remove('flex');
+            document.getElementById('admin-actions-bar').classList.add('hidden');
+            document.getElementById('admin-actions-bar').classList.remove('flex');
+            showToast('Sesión de administración cerrada', 'info');
+            render();
+        }
+
+        function togglePasswordVisibility() {
+            const pinInput = document.getElementById('admin-pin-input');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (pinInput.type === 'password') {
+                pinInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                pinInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function render() {
+            updateMetrics();
+            
+            let filtered = candidates.filter(cand => {
+                if (currentFilter === 'disponible' && cand.estado !== 'disponible') return false;
+                if (currentFilter === 'desactivado' && cand.estado !== 'desactivado') return false;
+                if (currentFilter === 'con_interes' && (!cand.interes || cand.interes.trim() === '')) return false;
+
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    const inNombre = cand.nombre.toLowerCase().includes(q);
+                    const inDni = cand.dni.toLowerCase().includes(q);
+                    const inOrden = cand.orden.toString().includes(q);
+                    const inOpta = cand.opta.toLowerCase().includes(q);
+                    const inInteres = (cand.interes || '').toLowerCase().includes(q);
+                    return inNombre || inDni || inOrden || inOpta || inInteres;
+                }
+                return true;
+            });
+
+            if (currentView === 'table') {
+                renderTable(filtered);
+            } else {
+                renderCards(filtered);
+            }
+        }
+
+        function updateMetrics() {
+            const total = candidates.length;
+            const disp = candidates.filter(c => c.estado === 'disponible').length;
+            const desac = candidates.filter(c => c.estado === 'desactivado').length;
+            const conInteres = candidates.filter(c => c.interes && c.interes.trim() !== '').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-disponibles').innerText = disp;
+            document.getElementById('stat-desactivados').innerText = desac;
+            document.getElementById('stat-actualizados').innerText = conInteres;
+
+            ['todos', 'disponible', 'desactivado', 'con_interes'].forEach(f => {
+                const el = document.getElementById(`card-filter-${f}`);
+                if (el) {
+                    if (currentFilter === f) {
+                        el.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-200');
+                        el.classList.remove('border-slate-200');
+                    } else {
+                        el.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-200');
+                        el.classList.add('border-slate-200');
+                    }
+                }
+            });
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('candidates-table-body');
+            const emptyState = document.getElementById('empty-state-table');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            let html = '';
+            data.forEach((cand, index) => {
+                const isDesac = cand.estado === 'desactivado';
+                const rowBg = isDesac ? 'bg-rose-50/40 hover:bg-rose-50/70' : (index % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/50 hover:bg-slate-100/60');
+                
+                const optaBadges = cand.opta.split(',').map(p => 
+                    `<span class="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded font-mono border border-slate-200">${p.trim()}</span>`
+                ).join(' ');
+
+                let interesHtml = '';
+                if (!cand.interes || cand.interes.trim() === '') {
+                    interesHtml = `<span class="inline-flex items-center text-slate-400 text-xs italic font-normal">
+                        <i class="fa-regular fa-square mr-1 text-[11px]"></i> Sin indicar
+                    </span>`;
+                } else {
+                    const arrayInteres = cand.interes.split(',').map(p => p.trim());
+                    interesHtml = `<div class="flex flex-wrap gap-1">` + 
+                        arrayInteres.map(p => `<span class="inline-block bg-indigo-100 text-indigo-800 font-bold text-xs px-2 py-0.5 rounded border border-indigo-200">${p}</span>`).join('') +
+                        `</div>`;
+                }
+
+                const estadoBadge = isDesac 
+                    ? `<span class="inline-flex items-center gap-1 bg-rose-100 text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-rose-200">
+                        <span class="w-2 h-2 rounded-full bg-rose-600"></span> Desactivado
+                       </span>`
+                    : `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Disponible
+                       </span>`;
+
+                html += `
+                <tr class="${rowBg} transition border-b border-slate-200/70">
+                    <td class="py-3 px-4 font-bold text-slate-900 text-center font-mono">${cand.orden}</td>
+                    <td class="py-3 px-4 font-mono text-slate-600 text-xs">${cand.dni}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-semibold text-slate-800">${escapeHtml(cand.nombre)}</div>
+                        ${cand.telefono ? `<div class="text-[11px] text-slate-500"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${cand.telefono}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex flex-wrap gap-1">${optaBadges}</div>
+                    </td>
+                    <td class="py-3 px-4">${interesHtml}</td>
+                    <td class="py-3 px-4 text-center">${estadoBadge}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button 
+                                onclick="openCandidateSelfModal(${cand.id})" 
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1"
+                                title="Actualizar mis puestos de preferencia y estado"
+                            >
+                                <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                                <span>✏️ Actualizar datos</span>
+                            </button>
+
+                            ${isAdmin ? `
+                                <button 
+                                    onclick="openCandidateModalForAdmin(${cand.id})" 
+                                    class="bg-slate-200 hover:bg-slate-300 text-slate-700 p-1.5 rounded-lg text-xs" 
+                                    title="Editar completo (Admin)"
+                                >
+                                    <i class="fa-solid fa-user-pen"></i>
+                                </button>
+                                <button 
+                                    onclick="deleteCandidate(${cand.id})" 
+                                    class="bg-rose-100 hover:bg-rose-200 text-rose-700 p-1.5 rounded-lg text-xs" 
+                                    title="Eliminar candidato"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('view-container-cards');
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full p-8 text-center text-slate-500 bg-white rounded-xl border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                        <p class="font-medium">No hay candidatos para mostrar con los filtros actuales.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            data.forEach(cand => {
+                const isDesac = cand.estado === 'desactivado';
+                const hasInteres = cand.interes && cand.interes.trim() !== '';
+
+                html += `
+                <div class="bg-white rounded-xl shadow-sm border ${isDesac ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200'} p-4 flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                            <span class="bg-slate-900 text-white font-mono text-xs font-bold px-2.5 py-0.5 rounded-md">
+                                Nº ${cand.orden}
+                            </span>
+                            <span class="text-xs font-mono text-slate-500">${cand.dni}</span>
+                        </div>
+
+                        <h3 class="font-bold text-slate-800 text-base mb-2">${escapeHtml(cand.nombre)}</h3>
+
+                        <div class="space-y-2 mb-4 text-xs">
+                            <div>
+                                <span class="text-slate-500 text-[11px] block uppercase font-medium">Puestos a los que opta:</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    ${cand.opta.split(',').map(p => `<span class="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-mono">${p.trim()}</span>`).join('')}
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="text-slate-500 text-[11px] block uppercase font-medium">Puestos de interés:</span>
+                                <div class="mt-1">
+                                    ${hasInteres 
+                                        ? `<div class="flex flex-wrap gap-1">${cand.interes.split(',').map(p => `<span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded">${p.trim()}</span>`).join('')}</div>`
+                                        : `<span class="text-slate-400 italic">Sin indicar</span>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <div>
+                            ${isDesac 
+                                ? `<span class="text-xs text-rose-700 font-medium">🔴 Desactivado</span>`
+                                : `<span class="text-xs text-emerald-700 font-medium">🟢 Disponible</span>`
+                            }
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <button 
+                                onclick="openCandidateSelfModal(${cand.id})" 
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm"
+                            >
+                                ✏️ Actualizar datos
+                            </button>
+                            ${isAdmin ? `
+                                <button onclick="openCandidateModalForAdmin(${cand.id})" class="text-slate-500 hover:text-slate-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteCandidate(${cand.id})" class="text-rose-500 hover:text-rose-700 p-1.5"><i class="fa-solid fa-trash"></i></button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const tblContainer = document.getElementById('view-container-table');
+            const crdContainer = document.getElementById('view-container-cards');
+            const btnTbl = document.getElementById('view-btn-table');
+            const btnCrd = document.getElementById('view-btn-cards');
+
+            if (view === 'table') {
+                tblContainer.classList.remove('hidden');
+                crdContainer.classList.add('hidden');
+                btnTbl.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition shadow-sm bg-white text-indigo-700";
+                btnCrd.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900";
+            } else {
+                tblContainer.classList.add('hidden');
+                crdContainer.classList.remove('hidden');
+                btnCrd.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition shadow-sm bg-white text-indigo-700";
+                btnTbl.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900";
+            }
+            render();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value;
+            const clearBtn = document.getElementById('search-clear-btn');
+            if (searchQuery) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            render();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            searchQuery = '';
+            document.getElementById('search-clear-btn').classList.add('hidden');
+            render();
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            render();
+        }
+
+        function openCandidateSelfModal(id) {
+            const cand = candidates.find(c => String(c.id) === String(id));
+            if (!cand) return;
+
+            document.getElementById('self-cand-id').value = cand.id;
+            document.getElementById('self-cand-nombre').innerText = cand.nombre;
+            document.getElementById('self-cand-dni').innerText = cand.dni;
+            document.getElementById('self-cand-orden').innerText = cand.orden;
+            document.getElementById('self-cand-interes').value = cand.interes || '';
+            document.getElementById('self-cand-telefono').value = cand.telefono || '';
+            document.getElementById('self-cand-email').value = cand.email || '';
+
+            if (cand.estado === 'desactivado') {
+                document.getElementById('self-estado-desac').checked = true;
+            } else {
+                document.getElementById('self-estado-disp').checked = true;
+            }
+
+            const optaArray = cand.opta.split(',').map(s => s.trim()).filter(Boolean);
+            const badgesContainer = document.getElementById('self-cand-opta-badges');
+            badgesContainer.innerHTML = optaArray.map(p => 
+                `<span class="bg-indigo-50 text-indigo-700 font-mono text-xs px-2.5 py-1 rounded-md border border-indigo-200">Plaza ${p}</span>`
+            ).join('');
+
+            const quickContainer = document.getElementById('quick-select-puestos');
+            const currentInteresArray = (cand.interes || '').split(',').map(s => s.trim());
+            
+            let quickHtml = '';
+            optaArray.forEach(p => {
+                const selected = currentInteresArray.includes(p);
+                quickHtml += `
+                    <button 
+                        type="button" 
+                        onclick="toggleQuickPuesto('${p}')"
+                        id="btn-puesto-${p}"
+                        class="px-2.5 py-1 text-xs font-semibold rounded-lg border transition ${selected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}"
+                    >
+                        ${selected ? '✓ ' : '+ '}Puesto ${p}
+                    </button>
+                `;
+            });
+            quickContainer.innerHTML = quickHtml;
+
+            openModal('modal-candidate-self');
+        }
+
+        function toggleQuickPuesto(puesto) {
+            const input = document.getElementById('self-cand-interes');
+            let current = input.value.split(',').map(s => s.trim()).filter(Boolean);
+            
+            if (current.includes(puesto)) {
+                current = current.filter(x => x !== puesto);
+            } else {
+                current.push(puesto);
+            }
+
+            current.sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0));
+            input.value = current.join(', ');
+
+            const candIdRaw = document.getElementById('self-cand-id').value;
+            const cand = candidates.find(c => String(c.id) === String(candIdRaw));
+            if (cand) {
+                const optaArray = cand.opta.split(',').map(s => s.trim()).filter(Boolean);
+                optaArray.forEach(p => {
+                    const btn = document.getElementById(`btn-puesto-${p}`);
+                    if (btn) {
+                        const sel = current.includes(p);
+                        btn.className = `px-2.5 py-1 text-xs font-semibold rounded-lg border transition ${sel ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`;
+                        btn.innerText = (sel ? '✓ ' : '+ ') + 'Puesto ' + p;
+                    }
+                });
+            }
+        }
+
+        function saveCandidateSelfUpdate(e) {
+            if (e) e.preventDefault();
+            const idRaw = document.getElementById('self-cand-id').value;
+            const cand = candidates.find(c => String(c.id) === String(idRaw));
+            if (!cand) {
+                showToast('Error: No se encontró el candidato', 'error');
+                return;
+            }
+
+            cand.interes = (document.getElementById('self-cand-interes').value || '').trim();
+            cand.telefono = (document.getElementById('self-cand-telefono').value || '').trim();
+            cand.email = (document.getElementById('self-cand-email').value || '').trim();
+
+            const checkedState = document.querySelector('input[name="self-estado"]:checked');
+            cand.estado = checkedState ? checkedState.value : 'disponible';
+
+            saveData();
+            render();
+            closeModal('modal-candidate-self');
+            showToast('Tus datos de interés se han actualizado correctamente', 'success');
+        }
+
+        function openCandidateModalForAdmin(id) {
+            if (!isAdmin) return;
+            const isEdit = id !== null;
+            document.getElementById('admin-modal-title').innerText = isEdit ? 'Editar Candidato' : 'Nuevo Candidato';
+            document.getElementById('admin-cand-id').value = isEdit ? id : '';
+
+            if (isEdit) {
+                const cand = candidates.find(c => String(c.id) === String(id));
+                if (cand) {
+                    document.getElementById('admin-cand-orden').value = cand.orden;
+                    document.getElementById('admin-cand-dni').value = cand.dni;
+                    document.getElementById('admin-cand-nombre').value = cand.nombre;
+                    document.getElementById('admin-cand-opta').value = cand.opta;
+                    document.getElementById('admin-cand-interes').value = cand.interes || '';
+                    document.getElementById('admin-cand-estado').value = cand.estado;
+                }
+            } else {
+                document.getElementById('admin-cand-orden').value = (candidates.length > 0 ? Math.max(...candidates.map(c => c.orden)) + 1 : 1);
+                document.getElementById('admin-cand-dni').value = '***' + Math.floor(1000 + Math.random() * 9000) + '**';
+                document.getElementById('admin-cand-nombre').value = '';
+                document.getElementById('admin-cand-opta').value = '1, 2, 3';
+                document.getElementById('admin-cand-interes').value = '';
+                document.getElementById('admin-cand-estado').value = 'disponible';
+            }
+
+            openModal('modal-admin-edit');
+        }
+
+        function saveAdminCandidate(e) {
+            if (e) e.preventDefault();
+            const idVal = document.getElementById('admin-cand-id').value;
+            const isEdit = idVal !== '';
+
+            const item = {
+                id: isEdit ? (isNaN(idVal) ? idVal : parseInt(idVal)) : Date.now(),
+                orden: parseInt(document.getElementById('admin-cand-orden').value),
+                dni: document.getElementById('admin-cand-dni').value.trim(),
+                nombre: document.getElementById('admin-cand-nombre').value.trim().toUpperCase(),
+                opta: document.getElementById('admin-cand-opta').value.trim(),
+                interes: document.getElementById('admin-cand-interes').value.trim(),
+                estado: document.getElementById('admin-cand-estado').value
+            };
+
+            if (isEdit) {
+                const idx = candidates.findIndex(c => String(c.id) === String(item.id));
+                if (idx !== -1) {
+                    candidates[idx] = { ...candidates[idx], ...item };
+                }
+            } else {
+                candidates.push(item);
+            }
+
+            candidates.sort((a, b) => a.orden - b.orden);
+
+            saveData();
+            render();
+            closeModal('modal-admin-edit');
+            showToast('Registro guardado correctamente', 'success');
+        }
+
+        function deleteCandidate(id) {
+            if (!isAdmin) return;
+            if (confirm('¿Está seguro de que desea eliminar a este candidato de la lista?')) {
+                candidates = candidates.filter(c => String(c.id) !== String(id));
+                saveData();
+                render();
+                showToast('Candidato eliminado', 'info');
+            }
+        }
+
+        function openImportModal() {
+            if (!isAdmin) return;
+            document.getElementById('import-textarea').value = '';
+            document.getElementById('import-replace-chk').checked = false;
+            openModal('modal-import');
+        }
+
+        function processImport() {
+            const rawText = document.getElementById('import-textarea').value;
+            const replaceAll = document.getElementById('import-replace-chk').checked;
+
+            if (!rawText.trim()) {
+                showToast('Pegue algún contenido antes de importar', 'error');
+                return;
+            }
+
+            const lines = rawText.trim().split('\n');
+            const imported = [];
+
+            lines.forEach((line, index) => {
+                if (!line.trim()) return;
+                let parts = line.split('\t');
+                if (parts.length < 3) parts = line.split(';');
+                if (parts.length < 3) parts = line.split(',');
+
+                if (parts.length >= 3) {
+                    const orden = parseInt(parts[0].replace(/\D/g, '')) || (index + 1);
+                    const dni = parts[1].trim();
+                    const nombre = parts[2].trim().toUpperCase();
+                    const opta = parts[3] ? parts[3].trim() : '1, 2, 3';
+
+                    imported.push({
+                        id: Date.now() + index,
+                        orden: orden,
+                        dni: dni,
+                        nombre: nombre,
+                        opta: opta,
+                        interes: '',
+                        estado: 'disponible'
+                    });
+                }
+            });
+
+            if (imported.length === 0) {
+                showToast('No se pudieron reconocer datos tabulados en el texto', 'error');
+                return;
+            }
+
+            if (replaceAll) {
+                candidates = imported;
+            } else {
+                candidates = [...candidates, ...imported];
+            }
+
+            candidates.sort((a, b) => a.orden - b.orden);
+            saveData();
+            render();
+            closeModal('modal-import');
+            showToast(`Se han importado ${imported.length} candidatos correctamente`, 'success');
+        }
+
+        function confirmClearAll() {
+            if (!isAdmin) return;
+            if (confirm('⚠️ ¿ATENCIÓN: Vaciar la lista borrará todos los candidatos actuales. ¿Continuar?')) {
+                candidates = [];
+                saveData();
+                render();
+                showToast('Lista de candidatos vaciada', 'info');
+            }
+        }
+
+        function confirmResetDefaults() {
+            if (confirm('¿Restablecer los 11 candidatos iniciales con "Puestos de interés" en blanco?')) {
+                candidates = JSON.parse(JSON.stringify(INITIAL_CANDIDATES));
+                saveData();
+                render();
+                showToast('Lista restablecida a los 11 candidatos iniciales', 'success');
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = msg;
+
+            if (type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400';
+            } else if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-triangle-exclamation text-rose-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-info text-indigo-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
